@@ -38,10 +38,9 @@ TRANSLATIONS = {
         "title": "Kredi Kartı Dolandırıcılık Tespiti",
         "subtitle": "Kredi kartı işlemlerini gerçek zamanlı olarak analiz eden yapay zeka sistemi.\nAşağıdan bir örnek seçin veya kendi verilerinizi girin.",
         "quick_test": "### Hızlı Test",
-        "examples_note": "Örnek butonları, veri setindeki gerçek işlemlerden seçilmiştir.",
-        "fraud_btn": "Yüksek Risk (Gerçek Fraud)",
-        "normal_btn": "Düşük Risk (Gerçek Normal)",
-        "borderline_btn": "Sınırda İşlem (Gerçek Veri)",
+        "fraud_btn": "Yüksek Risk Örneği",
+        "normal_btn": "Düşük Risk Örneği",
+        "borderline_btn": "Sınırda Risk Örneği",
         "manual_input": "Manuel Veri Girişi (İleri Seviye)",
         "manual_desc": "V1–V28, PCA dönüşümü uygulanmış anonim banka özellikleridir. Bu alanları doldurmak için orijinal veri setine ihtiyaç duyulur.",
         "analyze_btn": "Analiz Et",
@@ -51,14 +50,14 @@ TRANSLATIONS = {
         "transaction": "İşlem",
         "risk_score": "Risk Skoru",
         "action": "Aksiyon",
-        "action_high": "İncele / Blokla",
-        "action_mid": "Manuel İnceleme Önerilir",
-        "action_low": "Onayla / İzle",
+        "action_high": "İncele / Gerekirse Blokla",
+        "action_mid": "Manuel İnceleme",
+        "action_low": "Onayla",
         "model_details": "Model Detayları",
         "algorithm": "Algoritma",
         "threshold_label": "Karar Eşiği",
         "raw_prob": "Ham Olasılık",
-        "decision_rule": "Karar Kuralı",
+        "decision_rule": "Model Eşiği",
         "top_factors": "En Etkili Faktörler",
         "factor_up": "fraud riskini artırıyor",
         "factor_down": "fraud riskini azaltıyor",
@@ -67,9 +66,9 @@ TRANSLATIONS = {
         "high_risk": "Yüksek Risk",
         "mid_risk": "Orta Risk",
         "low_risk": "Düşük Risk",
-        "fraud_verdict": "DOLANDIRICILIK TESPİT EDİLDİ",
-        "suspect_verdict": "ŞÜPHELİ İŞLEM",
-        "normal_verdict": "NORMAL İŞLEM",
+        "fraud_verdict": "Yüksek Fraud Riski",
+        "suspect_verdict": "Sınırda Risk",
+        "normal_verdict": "Düşük Risk",
         "fraud_exp": "Bu işlem model tarafından yüksek olasılıkla dolandırıcılık olarak puanlandı.",
         "suspect_exp": "Bu işlem sınırda risk profilindedir. Manuel inceleme önerilir.",
         "normal_exp": "Bu işlem düşük risk profilindedir. Şüpheli bir sinyal tespit edilmedi.",
@@ -79,10 +78,9 @@ TRANSLATIONS = {
         "title": "Credit Card Fraud Detection",
         "subtitle": "An AI system that analyzes credit card transactions in real time.\nSelect an example below or enter your own data.",
         "quick_test": "### Quick Test",
-        "examples_note": "Example buttons are selected from real transactions in the dataset.",
-        "fraud_btn": "High Risk (Real Fraud)",
-        "normal_btn": "Low Risk (Real Normal)",
-        "borderline_btn": "Borderline (Real Transaction)",
+        "fraud_btn": "High Risk Example",
+        "normal_btn": "Low Risk Example",
+        "borderline_btn": "Borderline Risk Example",
         "manual_input": "Manual Data Entry (Advanced)",
         "manual_desc": "V1–V28 are anonymized bank features transformed with PCA. You need the original dataset to fill these fields.",
         "analyze_btn": "Analyze",
@@ -93,13 +91,13 @@ TRANSLATIONS = {
         "risk_score": "Risk Score",
         "action": "Action",
         "action_high": "Review / Block Transaction",
-        "action_mid": "Manual Review Recommended",
-        "action_low": "Approve / Monitor",
+        "action_mid": "Manual Review",
+        "action_low": "Approve",
         "model_details": "Model Details",
         "algorithm": "Algorithm",
         "threshold_label": "Decision Threshold",
         "raw_prob": "Raw Probability",
-        "decision_rule": "Decision Rule",
+        "decision_rule": "Model Threshold",
         "top_factors": "Top Contributing Factors",
         "factor_up": "increases fraud risk",
         "factor_down": "decreases fraud risk",
@@ -108,9 +106,9 @@ TRANSLATIONS = {
         "high_risk": "High Risk",
         "mid_risk": "Medium Risk",
         "low_risk": "Low Risk",
-        "fraud_verdict": "FRAUD DETECTED",
-        "suspect_verdict": "SUSPICIOUS TRANSACTION",
-        "normal_verdict": "NORMAL TRANSACTION",
+        "fraud_verdict": "High Fraud Risk",
+        "suspect_verdict": "Borderline Risk",
+        "normal_verdict": "Low Risk",
         "fraud_exp": "This transaction is scored as highly likely fraudulent by the model.",
         "suspect_exp": "This transaction falls into a borderline risk profile. Manual review is recommended.",
         "normal_exp": "This transaction has a low risk profile. No suspicious signal was detected.",
@@ -179,10 +177,10 @@ NORMAL_EXAMPLE = [
 ]
 
 BORDERLINE_EXAMPLE = [
-    18709.0, -4.7353, 5.2251, -10.0603, 5.8162, -5.2049, -3.3476, -8.8116,
-    3.4952, -3.2722, -10.8864, 9.4217, -14.5727, 0.1540, -12.8783, -0.4991,
-    -9.7393, -16.3541, -5.0958, 1.9606, 1.3658, 1.5077, -0.3854, -0.0609,
-    -0.0137, 0.0512, -0.3014, 2.0519, 0.6555, 89.99
+    48533.0, 1.2438, 0.5245, -0.5389, 1.2092, 0.4795, -0.1974, 0.0492,
+    0.0378, 0.1281, -0.5529, -0.6684, -0.8188, -0.8838, -0.9946, 1.5068,
+    0.6240, 0.7058, 0.5242, -0.7317, -0.1715, -0.0517, -0.0841, -0.1928,
+    -0.9174, 0.6820, -0.1944, 0.0459, 0.0401, 1.0
 ]
 
 
@@ -219,13 +217,11 @@ def predict_gradio(*args):
     pct = prob * 100
 
     amount = float(features[-1])
-    review_floor = max(0.50, threshold * 0.80)
-
-    if prob >= threshold:
+    if prob >= 0.90:
         risk_label, risk_color, bg_color, border_color = t["high_risk"], "#dc2626", "#fee2e2", "#fca5a5"
         verdict, explanation = t["fraud_verdict"], t["fraud_exp"]
         action_text = t["action_high"]
-    elif prob >= review_floor:
+    elif prob >= 0.50:
         risk_label, risk_color, bg_color, border_color = t["mid_risk"], "#d97706", "#fef3c7", "#fcd34d"
         verdict, explanation = t["suspect_verdict"], t["suspect_exp"]
         action_text = t["action_mid"]
@@ -250,7 +246,7 @@ def predict_gradio(*args):
     <div style="background:{bg_color};border:2px solid {border_color};border-radius:16px;padding:28px;font-family:'Segoe UI',sans-serif;color:#111827;">
         <div style="text-align:center;margin-bottom:20px;">
             <h2 style="color:{risk_color};margin:8px 0;font-size:30px;letter-spacing:0.5px;">{verdict}</h2>
-            <span style="background:{risk_color};color:white;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:700;text-transform:uppercase;">{risk_label}</span>
+            <span style="background:{risk_color};color:white;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:700;">{risk_label}</span>
         </div>
         <div style="margin:0 0 14px 0;padding:14px;border-radius:12px;background:rgba(255,255,255,0.58);border:1px solid rgba(15,23,42,0.10);">
             <table style="width:100%;border-collapse:collapse;">
@@ -280,7 +276,7 @@ def predict_gradio(*args):
             <tr><td style="padding:4px 0;color:#4b5563;">ROC-AUC</td><td style="text-align:right;font-weight:600;color:#111827;">0.975</td></tr>
             <tr><td style="padding:4px 0;color:#4b5563;">{t['threshold_label']}</td><td style="text-align:right;font-weight:600;color:#111827;">{threshold:.4f}</td></tr>
             <tr><td style="padding:4px 0;color:#4b5563;">{t['raw_prob']}</td><td style="text-align:right;font-weight:600;color:#111827;">{prob:.6f}</td></tr>
-            <tr><td style="padding:4px 0;color:#4b5563;">{t['decision_rule']}</td><td style="text-align:right;font-weight:600;color:#111827;">score {'>=' if pred else '<'} {threshold:.4f}</td></tr>
+            <tr><td style="padding:4px 0;color:#4b5563;">{t['decision_rule']}</td><td style="text-align:right;font-weight:600;color:#111827;">{threshold:.4f}</td></tr>
             <tr><td style="padding:4px 0;color:#6b7280;">{t['decision']}</td><td style="text-align:right;font-weight:600;color:{risk_color};">{'Fraud' if pred else 'Normal'}</td></tr>
         </table>
         <h4 style="margin:14px 0 8px 0;color:#374151;">{t['top_factors']}</h4>
@@ -317,10 +313,6 @@ APP_CSS = """
   max-width: 1240px !important;
   margin: 0 auto !important;
 }
-#demo-note p {
-  color: #94a3b8 !important;
-  margin-top: -4px !important;
-}
 #btn-predict button {
   font-weight: 700 !important;
   letter-spacing: 0.2px !important;
@@ -335,14 +327,10 @@ with gr.Blocks(title="Credit Card Fraud Detection", css=APP_CSS) as demo:
 
     # Hızlı test
     quick_test_md = gr.Markdown("### Hızlı Test")
-    examples_note_md = gr.Markdown(
-        "Örnek butonları veri setindeki gerçek işlemlerden seçilmiştir.",
-        elem_id="demo-note",
-    )
     with gr.Row():
-        btn_fraud = gr.Button("Yüksek Risk (Gerçek Fraud)", variant="secondary")
-        btn_normal = gr.Button("Düşük Risk (Gerçek Normal)", variant="secondary")
-        btn_borderline = gr.Button("Sınırda İşlem (Gerçek Veri)", variant="secondary")
+        btn_fraud = gr.Button("Yüksek Risk Örneği", variant="secondary")
+        btn_normal = gr.Button("Düşük Risk Örneği", variant="secondary")
+        btn_borderline = gr.Button("Sınırda Risk Örneği", variant="secondary")
 
     # Manuel giriş
     with gr.Accordion("Manuel Veri Girişi (İleri Seviye)", open=False) as manual_accordion:
