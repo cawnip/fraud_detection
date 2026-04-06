@@ -1,0 +1,9 @@
+data/
+logs/
+plots/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+models/logistic_regression.joblib
+models/random_forest.joblib
