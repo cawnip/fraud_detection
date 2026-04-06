@@ -4,7 +4,8 @@ emoji: 💳
 colorFrom: red
 colorTo: gray
 sdk: gradio
-sdk_version: 4.44.0
+sdk_version: 4.44.1
+python_version: 3.10
 app_file: app.py
 pinned: false
 ---
@@ -107,7 +108,8 @@ fraud-ai-system/
 ├── main.py                 # Tam eğitim pipeline'ı
 ├── app.py                  # FastAPI + Gradio deployment
 ├── config.py               # Merkezi konfigürasyon
-└── requirements.txt
+├── requirements.txt        # HF deploy (minimal bağımlılıklar)
+└── requirements-train.txt  # Eğitim/EDA bağımlılıkları
 ```
 
 ---
@@ -118,7 +120,11 @@ fraud-ai-system/
 git clone <repo-url>
 cd fraud-ai-system
 
+# HF deploy / inference için
 pip install -r requirements.txt
+
+# Model eğitimi için (opsiyonel, yerelde training çalıştıracaksan)
+pip install -r requirements-train.txt
 ```
 
 > **macOS:** XGBoost için `libomp` gereklidir:
