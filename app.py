@@ -39,6 +39,8 @@ TRANSLATIONS = {
         "quick_test": "### Hızlı Test",
         "fraud_btn": "🚨  Sahte İşlem Örneği",
         "normal_btn": "✅  Normal İşlem Örneği",
+        "borderline_btn": "⚖️  Sınırda Risk Örneği",
+        "edge_btn": "💸  Uç Tutar Örneği",
         "manual_input": "Manuel Veri Girişi (İleri Seviye)",
         "manual_desc": "V1–V28, PCA dönüşümü uygulanmış anonim banka özellikleridir. Bu alanları doldurmak için orijinal veri setine ihtiyaç duyulur.",
         "analyze_btn": "Analiz Et",
@@ -50,6 +52,9 @@ TRANSLATIONS = {
         "transaction": "İşlem",
         "risk_score": "Risk Skoru",
         "action": "Aksiyon",
+        "action_high": "İncele / Blokla",
+        "action_mid": "Manuel İnceleme Önerilir",
+        "action_low": "Onayla / İzle",
         "model_details": "Model Detayları",
         "algorithm": "Algoritma",
         "threshold_label": "Karar Eşiği",
@@ -73,6 +78,8 @@ TRANSLATIONS = {
         "quick_test": "### Quick Test",
         "fraud_btn": "🚨  Fraudulent Transaction Example",
         "normal_btn": "✅  Normal Transaction Example",
+        "borderline_btn": "⚖️  Borderline Risk Example",
+        "edge_btn": "💸  Extreme Amount Example",
         "manual_input": "Manual Data Entry (Advanced)",
         "manual_desc": "V1–V28 are anonymized bank features transformed with PCA. You need the original dataset to fill these fields.",
         "analyze_btn": "Analyze",
@@ -84,6 +91,9 @@ TRANSLATIONS = {
         "transaction": "Transaction",
         "risk_score": "Risk Score",
         "action": "Action",
+        "action_high": "Review / Block Transaction",
+        "action_mid": "Manual Review Recommended",
+        "action_low": "Approve / Monitor",
         "model_details": "Model Details",
         "algorithm": "Algorithm",
         "threshold_label": "Decision Threshold",
@@ -163,6 +173,20 @@ NORMAL_EXAMPLE = [
     0.0669, 0.1285, -0.1891, 0.1336, -0.0211, 149.62
 ]
 
+BORDERLINE_EXAMPLE = [
+    212.3380, -1.8579, 0.9862, 0.3678, 2.7483, -0.4345, -0.5255, -1.2128,
+    0.7749, -1.2752, -1.4066, 1.4115, -1.8113, -0.7842, -2.3917, 0.9041,
+    -0.8210, -1.3809, 0.0035, 0.4108, 0.1863, 0.2618, 0.1142, -0.2960,
+    0.1994, 0.0846, 0.0028, 0.2003, -0.0850, 71.3687
+]
+
+EDGE_AMOUNT_EXAMPLE = [
+    10000.0, -1.3598, -0.0728, 2.5363, 1.3782, -0.3383, 0.4624, 0.2396,
+    0.0987, 0.3638, 0.0908, -0.5516, -0.6178, -0.9914, -0.3112, 1.4682,
+    -0.4704, 0.2080, 0.0258, 0.4040, 0.2514, -0.0183, 0.2778, -0.1105,
+    0.0669, 0.1285, -0.1891, 0.1336, -0.0211, 5000.0
+]
+
 
 # ---------------------------------------------------------------------------
 # Tahmin fonksiyonu
@@ -189,15 +213,15 @@ def predict_gradio(*args):
     if pct >= 80:
         risk_label, risk_color, bg_color, border_color = t["high_risk"], "#dc2626", "#fee2e2", "#fca5a5"
         icon, verdict, explanation = "🚨", t["fraud_verdict"], t["fraud_exp"]
-        action_text = "Review / Block Transaction"
+        action_text = t["action_high"]
     elif pct >= 40:
         risk_label, risk_color, bg_color, border_color = t["mid_risk"], "#d97706", "#fef3c7", "#fcd34d"
         icon, verdict, explanation = "⚠️", t["suspect_verdict"], t["suspect_exp"]
-        action_text = "Manual Review Recommended"
+        action_text = t["action_mid"]
     else:
         risk_label, risk_color, bg_color, border_color = t["low_risk"], "#16a34a", "#dcfce7", "#86efac"
         icon, verdict, explanation = "✅", t["normal_verdict"], t["normal_exp"]
-        action_text = "Approve / Monitor"
+        action_text = t["action_low"]
 
     # Dark/light tema farklarında metinlerin kaybolmaması için sabit renk kullan
     explanation_safe = explanation.replace("<b>", "<b style='color:#111827;font-weight:700;'>")
@@ -210,9 +234,9 @@ def predict_gradio(*args):
             <span style="background:{risk_color};color:white;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:bold;">{risk_label}</span>
         </div>
         <div style="margin:0 0 14px 0;padding:14px;border-radius:12px;background:rgba(255,255,255,0.55);border:1px solid rgba(0,0,0,0.07);">
-            <p style="margin:0 0 6px 0;color:#1f2937;font-size:15px;"><b>💳 {t['transaction']}:</b> ${amount:,.2f}</p>
-            <p style="margin:0 0 6px 0;color:#1f2937;font-size:15px;"><b>📈 {t['risk_score']}:</b> {prob:.4f}</p>
-            <p style="margin:0;color:#111827;font-size:15px;"><b>{t['action']}:</b> <span style="color:{risk_color};font-weight:700;">{action_text}</span></p>
+            <p style="margin:0 0 6px 0;color:#1f2937;font-size:15px;"><span style="font-weight:700;color:#374151;">💳 {t['transaction']}:</span> <span style="font-weight:700;color:#1f2937;">${amount:,.2f}</span></p>
+            <p style="margin:0 0 6px 0;color:#1f2937;font-size:15px;"><span style="font-weight:700;color:#374151;">📈 {t['risk_score']}:</span> <span style="font-weight:700;color:#1f2937;">{prob:.4f}</span></p>
+            <p style="margin:0;color:#111827;font-size:15px;"><span style="font-weight:700;color:#374151;">{t['action']}:</span> <span style="color:{risk_color};font-weight:700;">{action_text}</span></p>
         </div>
         <div style="margin:20px 0;">
             <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
@@ -273,6 +297,9 @@ with gr.Blocks(title="Credit Card Fraud Detection") as demo:
     with gr.Row():
         btn_fraud = gr.Button("🚨  Sahte İşlem Örneği", variant="secondary")
         btn_normal = gr.Button("✅  Normal İşlem Örneği", variant="secondary")
+    with gr.Row():
+        btn_borderline = gr.Button("⚖️  Sınırda Risk Örneği", variant="secondary")
+        btn_edge = gr.Button("💸  Uç Tutar Örneği", variant="secondary")
 
     # Manuel giriş
     with gr.Accordion("Manuel Veri Girişi (İleri Seviye)", open=False) as manual_accordion:
@@ -301,6 +328,8 @@ with gr.Blocks(title="Credit Card Fraud Detection") as demo:
     )
     btn_fraud.click(lambda: FRAUD_EXAMPLE, outputs=inputs)
     btn_normal.click(lambda: NORMAL_EXAMPLE, outputs=inputs)
+    btn_borderline.click(lambda: BORDERLINE_EXAMPLE, outputs=inputs)
+    btn_edge.click(lambda: EDGE_AMOUNT_EXAMPLE, outputs=inputs)
 
 # ---------------------------------------------------------------------------
 # Mount & run
