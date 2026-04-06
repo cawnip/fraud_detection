@@ -47,6 +47,9 @@ TRANSLATIONS = {
         "language_label": "Dil / Language",
         "footer": "**Veri Seti:** [ULB Credit Card Fraud](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) — 284.807 işlem, %0.17 fraud\n**Model:** XGBoost | ROC-AUC: 0.975 | Threshold: F2-score ile optimize edildi",
         "fraud_prob": "Fraud Olasılığı",
+        "transaction": "İşlem",
+        "risk_score": "Risk Skoru",
+        "action": "Aksiyon",
         "model_details": "Model Detayları",
         "algorithm": "Algoritma",
         "threshold_label": "Karar Eşiği",
@@ -78,6 +81,9 @@ TRANSLATIONS = {
         "language_label": "Dil / Language",
         "footer": "**Dataset:** [ULB Credit Card Fraud](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) — 284,807 transactions, 0.17% fraud\n**Model:** XGBoost | ROC-AUC: 0.975 | Threshold optimized with F2-score",
         "fraud_prob": "Fraud Probability",
+        "transaction": "Transaction",
+        "risk_score": "Risk Score",
+        "action": "Action",
         "model_details": "Model Details",
         "algorithm": "Algorithm",
         "threshold_label": "Decision Threshold",
@@ -178,15 +184,20 @@ def predict_gradio(*args):
     pred = result["prediction"]
     pct = prob * 100
 
+    amount = float(features[-1])
+
     if pct >= 80:
         risk_label, risk_color, bg_color, border_color = t["high_risk"], "#dc2626", "#fee2e2", "#fca5a5"
         icon, verdict, explanation = "🚨", t["fraud_verdict"], t["fraud_exp"]
+        action_text = "Review / Block Transaction"
     elif pct >= 40:
         risk_label, risk_color, bg_color, border_color = t["mid_risk"], "#d97706", "#fef3c7", "#fcd34d"
         icon, verdict, explanation = "⚠️", t["suspect_verdict"], t["suspect_exp"]
+        action_text = "Manual Review Recommended"
     else:
         risk_label, risk_color, bg_color, border_color = t["low_risk"], "#16a34a", "#dcfce7", "#86efac"
         icon, verdict, explanation = "✅", t["normal_verdict"], t["normal_exp"]
+        action_text = "Approve / Monitor"
 
     # Dark/light tema farklarında metinlerin kaybolmaması için sabit renk kullan
     explanation_safe = explanation.replace("<b>", "<b style='color:#111827;font-weight:700;'>")
@@ -198,10 +209,15 @@ def predict_gradio(*args):
             <h2 style="color:{risk_color};margin:8px 0;font-size:24px;letter-spacing:1px;">{verdict}</h2>
             <span style="background:{risk_color};color:white;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:bold;">{risk_label}</span>
         </div>
+        <div style="margin:0 0 14px 0;padding:14px;border-radius:12px;background:rgba(255,255,255,0.55);border:1px solid rgba(0,0,0,0.07);">
+            <p style="margin:0 0 6px 0;color:#1f2937;font-size:15px;"><b>💳 {t['transaction']}:</b> ${amount:,.2f}</p>
+            <p style="margin:0 0 6px 0;color:#1f2937;font-size:15px;"><b>📈 {t['risk_score']}:</b> {prob:.4f}</p>
+            <p style="margin:0;color:#111827;font-size:15px;"><b>{t['action']}:</b> <span style="color:{risk_color};font-weight:700;">{action_text}</span></p>
+        </div>
         <div style="margin:20px 0;">
             <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
                 <span style="color:#374151;font-weight:600;">{t['fraud_prob']}</span>
-                <span style="color:{risk_color};font-weight:bold;font-size:18px;">%{pct:.1f}</span>
+                <span style="color:{risk_color};font-weight:bold;font-size:18px;">%{pct:.2f}</span>
             </div>
             <div style="background:#e5e7eb;border-radius:999px;height:14px;overflow:hidden;">
                 <div style="background:{risk_color};width:{int(pct)}%;height:100%;border-radius:999px;"></div>
