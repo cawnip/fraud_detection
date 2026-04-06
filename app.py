@@ -188,8 +188,11 @@ def predict_gradio(*args):
         risk_label, risk_color, bg_color, border_color = t["low_risk"], "#16a34a", "#dcfce7", "#86efac"
         icon, verdict, explanation = "✅", t["normal_verdict"], t["normal_exp"]
 
+    # Dark/light tema farklarında metinlerin kaybolmaması için sabit renk kullan
+    explanation_safe = explanation.replace("<b>", "<b style='color:#111827;font-weight:700;'>")
+
     result_html = f"""
-    <div style="background:{bg_color};border:2px solid {border_color};border-radius:16px;padding:28px;font-family:sans-serif;">
+    <div style="background:{bg_color};border:2px solid {border_color};border-radius:16px;padding:28px;font-family:sans-serif;color:#111827;">
         <div style="text-align:center;margin-bottom:20px;">
             <span style="font-size:48px;">{icon}</span>
             <h2 style="color:{risk_color};margin:8px 0;font-size:24px;letter-spacing:1px;">{verdict}</h2>
@@ -204,21 +207,21 @@ def predict_gradio(*args):
                 <div style="background:{risk_color};width:{int(pct)}%;height:100%;border-radius:999px;"></div>
             </div>
         </div>
-        <p style="color:#4b5563;font-size:14px;line-height:1.6;margin:16px 0 0 0;">{explanation}</p>
+        <p style="color:#374151;font-size:14px;line-height:1.6;margin:16px 0 0 0;">{explanation_safe}</p>
     </div>
     """
 
     detail_html = f"""
-    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px;font-family:sans-serif;font-size:13px;">
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px;font-family:sans-serif;font-size:13px;color:#111827;">
         <h4 style="margin:0 0 12px 0;color:#374151;">{t['model_details']}</h4>
         <table style="width:100%;border-collapse:collapse;">
-            <tr><td style="padding:4px 0;color:#6b7280;">{t['algorithm']}</td><td style="text-align:right;font-weight:600;">XGBoost</td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">ROC-AUC</td><td style="text-align:right;font-weight:600;">0.975</td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">{t['threshold_label']}</td><td style="text-align:right;font-weight:600;">{threshold:.4f}</td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">{t['raw_prob']}</td><td style="text-align:right;font-weight:600;">{prob:.6f}</td></tr>
+            <tr><td style="padding:4px 0;color:#4b5563;">{t['algorithm']}</td><td style="text-align:right;font-weight:600;color:#111827;">XGBoost</td></tr>
+            <tr><td style="padding:4px 0;color:#4b5563;">ROC-AUC</td><td style="text-align:right;font-weight:600;color:#111827;">0.975</td></tr>
+            <tr><td style="padding:4px 0;color:#4b5563;">{t['threshold_label']}</td><td style="text-align:right;font-weight:600;color:#111827;">{threshold:.4f}</td></tr>
+            <tr><td style="padding:4px 0;color:#4b5563;">{t['raw_prob']}</td><td style="text-align:right;font-weight:600;color:#111827;">{prob:.6f}</td></tr>
             <tr><td style="padding:4px 0;color:#6b7280;">{t['decision']}</td><td style="text-align:right;font-weight:600;color:{risk_color};">{'Fraud' if pred else 'Normal'}</td></tr>
         </table>
-        <p style="margin:12px 0 0 0;color:#9ca3af;font-size:11px;">{t['pca_note']}</p>
+        <p style="margin:12px 0 0 0;color:#6b7280;font-size:11px;">{t['pca_note']}</p>
     </div>
     """
 
