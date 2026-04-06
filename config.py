@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 # Paths
 ROOT_DIR = Path(__file__).parent
@@ -26,5 +27,5 @@ BETA = 2.0  # F-beta: beta > 1 → recall ağırlıklı
 DEPLOY_MODEL = "xgboost"
 
 # App
-HOST = "0.0.0.0"
-PORT = 7860
+HOST = os.getenv("HOST", "0.0.0.0")
+PORT = int(os.getenv("PORT", "7860"))
