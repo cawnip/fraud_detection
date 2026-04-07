@@ -1,4 +1,5 @@
 import logging
+import os
 import optuna
 import numpy as np
 from xgboost import XGBClassifier
@@ -15,6 +16,11 @@ def tune_xgboost(X_train, y_train, n_trials: int = 30) -> dict:
     PR-AUC maximize edilir (imbalanced veri için).
     """
 
+    X_train = np.asarray(X_train)
+    y_train = np.asarray(y_train)
+    skf = StratifiedKFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
+    cv_jobs = min(CV_FOLDS, os.cpu_count() or 1)
+
     def objective(trial):
         params = {
             "n_estimators": trial.suggest_int("n_estimators", 50, 300),
@@ -27,12 +33,14 @@ def tune_xgboost(X_train, y_train, n_trials: int = 30) -> dict:
             "scale_pos_weight": SCALE_POS_WEIGHT,
             "eval_metric": "logloss",
             "random_state": RANDOM_STATE,
-            "n_jobs": -1,
+            # CV zaten paralel çalışıyor; model thread sayısını 1 tutarak oversubscription önlenir.
+            "n_jobs": 1,
         }
 
         model = XGBClassifier(**params)
-        skf = StratifiedKFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
-        scores = cross_val_score(model, X_train, y_train, cv=skf, scoring="average_precision", n_jobs=-1)
+        scores = cross_val_score(
+            model, X_train, y_train, cv=skf, scoring="average_precision", n_jobs=cv_jobs
+        )
         return scores.mean()
 
     logger.info(f"Optuna tuning başlıyor ({n_trials} trial)...")

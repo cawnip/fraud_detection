@@ -9,12 +9,10 @@ logger = logging.getLogger(__name__)
 
 def train_model(model, X_train, y_train, model_name: str = "model"):
     logger.info(f"[{model_name}] Eğitim başlıyor...")
-    print(f"\n[{model_name}] Eğitim başlıyor...")
     start = time.time()
     model.fit(X_train, y_train)
     elapsed = time.time() - start
     logger.info(f"[{model_name}] Eğitim tamamlandı ({elapsed:.1f}s)")
-    print(f"[{model_name}] Eğitim tamamlandı ({elapsed:.1f}s)")
     return model
 
 
@@ -24,7 +22,6 @@ def save_model(model, model_name: str, save_dir: str = None):
     path = os.path.join(save_dir, f"{model_name}.joblib")
     joblib.dump(model, path)
     logger.info(f"Model kaydedildi: {path}")
-    print(f"Model kaydedildi: {path}")
     return path
 
 

@@ -6,6 +6,7 @@ ROOT_DIR = Path(__file__).parent
 DATA_DIR = ROOT_DIR / "data"
 MODEL_DIR = ROOT_DIR / "models"
 LOG_DIR = ROOT_DIR / "logs"
+PLOT_DIR = ROOT_DIR / "plots"
 
 DATA_PATH = DATA_DIR / "creditcard.csv"
 

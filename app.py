@@ -22,98 +22,73 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 MODEL_PATH = MODEL_DIR / f"{DEPLOY_MODEL}.joblib"
 THRESHOLD_PATH = MODEL_DIR / f"{DEPLOY_MODEL}_threshold.joblib"
+SCALER_PATH = MODEL_DIR / "scaler.joblib"
 
 model = joblib.load(MODEL_PATH)
 threshold = float(joblib.load(THRESHOLD_PATH)) if THRESHOLD_PATH.exists() else 0.5
+scaler = joblib.load(SCALER_PATH) if SCALER_PATH.exists() else None
 logger.info(f"Model yüklendi: {MODEL_PATH} | Threshold: {threshold:.4f}")
+if scaler is None:
+    logger.warning("scaler.joblib bulunamadı — Time/Amount ham değerlerle kullanılıyor.")
 
 FEATURE_NAMES = ["Time"] + [f"V{i}" for i in range(1, 29)] + ["Amount"]
 N_FEATURES = len(FEATURE_NAMES)
+_TIME_IDX = FEATURE_NAMES.index("Time")
+_AMOUNT_IDX = FEATURE_NAMES.index("Amount")
+
+
+def _apply_scaler(arr: np.ndarray) -> np.ndarray:
+    """Time ve Amount sütunlarını eğitim scaler'ı ile ölçeklendirir."""
+    if scaler is None:
+        return arr
+    out = arr.copy()
+    out[0, [_TIME_IDX, _AMOUNT_IDX]] = scaler.transform(
+        arr[:, [_TIME_IDX, _AMOUNT_IDX]]
+    )[0]
+    return out
 
 # ---------------------------------------------------------------------------
 # Çeviri
 # ---------------------------------------------------------------------------
 TRANSLATIONS = {
-    "tr": {
-        "title": "Kredi Kartı Dolandırıcılık Tespiti",
-        "subtitle": "Kredi kartı işlemlerini gerçek zamanlı olarak analiz eden yapay zeka sistemi.\nAşağıdan bir örnek seçin veya kendi verilerinizi girin.",
-        "quick_test": "### Hızlı Test",
-        "fraud_btn": "Yüksek Risk Örneği",
-        "normal_btn": "Düşük Risk Örneği",
-        "borderline_btn": "Sınırda Risk Örneği",
-        "manual_input": "Manuel Veri Girişi (İleri Seviye)",
-        "manual_desc": "V1–V28, PCA dönüşümü uygulanmış anonim banka özellikleridir. Bu alanları doldurmak için orijinal veri setine ihtiyaç duyulur.",
-        "analyze_btn": "Analiz Et",
-        "result_title": "### Sonuç",
-        "footer": "**Veri Seti:** [ULB Credit Card Fraud](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) — 284.807 işlem, %0.17 fraud\n**Model:** XGBoost | ROC-AUC: 0.975 | Karar Eşiği: F2-score ile optimize edildi",
-        "fraud_prob": "Fraud Olasılığı",
-        "transaction": "İşlem",
-        "risk_score": "Risk Skoru",
-        "action": "Aksiyon",
-        "action_high": "İncele / Gerekirse Blokla",
-        "action_mid": "Manuel İnceleme",
-        "action_low": "Onayla",
-        "model_details": "Model Detayları",
-        "algorithm": "Algoritma",
-        "threshold_label": "Karar Eşiği",
-        "raw_prob": "Ham Olasılık",
-        "decision_rule": "Model Eşiği",
-        "top_factors": "En Etkili Faktörler",
-        "factor_up": "fraud riskini artırıyor",
-        "factor_down": "fraud riskini azaltıyor",
-        "decision": "Karar",
-        "pca_note": "V1–V28 özellikleri PCA ile anonimleştirilmiş banka verisidir. Threshold, F2-score (recall ağırlıklı) ile optimize edilmiştir.",
-        "high_risk": "Yüksek Risk",
-        "mid_risk": "Orta Risk",
-        "low_risk": "Düşük Risk",
-        "fraud_verdict": "Yüksek Fraud Riski",
-        "suspect_verdict": "Sınırda Risk",
-        "normal_verdict": "Düşük Risk",
-        "fraud_exp": "Bu işlem model tarafından yüksek olasılıkla dolandırıcılık olarak puanlandı.",
-        "suspect_exp": "Bu işlem sınırda risk profilindedir. Manuel inceleme önerilir.",
-        "normal_exp": "Bu işlem düşük risk profilindedir. Şüpheli bir sinyal tespit edilmedi.",
-        "error": "Hata",
-    },
-    "en": {
-        "title": "Credit Card Fraud Detection",
-        "subtitle": "An AI system that analyzes credit card transactions in real time.\nSelect an example below or enter your own data.",
-        "quick_test": "### Quick Test",
-        "fraud_btn": "High Risk Example",
-        "normal_btn": "Low Risk Example",
-        "borderline_btn": "Borderline Risk Example",
-        "manual_input": "Manual Data Entry (Advanced)",
-        "manual_desc": "V1–V28 are anonymized bank features transformed with PCA. You need the original dataset to fill these fields.",
-        "analyze_btn": "Analyze",
-        "result_title": "### Result",
-        "footer": "**Dataset:** [ULB Credit Card Fraud](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) — 284,807 transactions, 0.17% fraud\n**Model:** XGBoost | ROC-AUC: 0.975 | Decision threshold optimized with F2-score",
-        "fraud_prob": "Fraud Probability",
-        "transaction": "Transaction",
-        "risk_score": "Risk Score",
-        "action": "Action",
-        "action_high": "Review / Block Transaction",
-        "action_mid": "Manual Review",
-        "action_low": "Approve",
-        "model_details": "Model Details",
-        "algorithm": "Algorithm",
-        "threshold_label": "Decision Threshold",
-        "raw_prob": "Raw Probability",
-        "decision_rule": "Model Threshold",
-        "top_factors": "Top Contributing Factors",
-        "factor_up": "increases fraud risk",
-        "factor_down": "decreases fraud risk",
-        "decision": "Decision",
-        "pca_note": "V1–V28 are PCA-anonymized bank features. Threshold is optimized using F2-score (recall-weighted).",
-        "high_risk": "High Risk",
-        "mid_risk": "Medium Risk",
-        "low_risk": "Low Risk",
-        "fraud_verdict": "High Fraud Risk",
-        "suspect_verdict": "Borderline Risk",
-        "normal_verdict": "Low Risk",
-        "fraud_exp": "This transaction is scored as highly likely fraudulent by the model.",
-        "suspect_exp": "This transaction falls into a borderline risk profile. Manual review is recommended.",
-        "normal_exp": "This transaction has a low risk profile. No suspicious signal was detected.",
-        "error": "Error",
-    },
+    "title": "Kredi Kartı Dolandırıcılık Tespiti",
+    "subtitle": "Kredi kartı işlemlerini gerçek zamanlı olarak analiz eden yapay zeka sistemi.\nAşağıdan bir örnek seçin veya kendi verilerinizi girin.",
+    "quick_test": "### Hızlı Test",
+    "fraud_btn": "Yüksek Risk Örneği",
+    "normal_btn": "Düşük Risk Örneği",
+    "borderline_btn": "Sınırda Risk Örneği",
+    "manual_input": "Manuel Veri Girişi (İleri Seviye)",
+    "manual_desc": "V1–V28, PCA dönüşümü uygulanmış anonim banka özellikleridir. Bu alanları doldurmak için orijinal veri setine ihtiyaç duyulur.",
+    "analyze_btn": "Analiz Et",
+    "result_title": "### Sonuç",
+    "footer": "**Veri Seti:** [ULB Credit Card Fraud](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) — 284.807 işlem, %0.17 fraud\n**Model:** XGBoost | ROC-AUC: 0.975 | Karar Eşiği: F2-score ile optimize edildi",
+    "fraud_prob": "Fraud Olasılığı",
+    "transaction": "İşlem",
+    "risk_score": "Risk Skoru",
+    "action": "Aksiyon",
+    "action_high": "İncele / Gerekirse Blokla",
+    "action_mid": "Manuel İnceleme",
+    "action_low": "Onayla",
+    "model_details": "Model Detayları",
+    "algorithm": "Algoritma",
+    "threshold_label": "Karar Eşiği",
+    "raw_prob": "Ham Olasılık",
+    "decision_rule": "Model Eşiği",
+    "top_factors": "En Etkili Faktörler",
+    "factor_up": "fraud riskini artırıyor",
+    "factor_down": "fraud riskini azaltıyor",
+    "decision": "Karar",
+    "pca_note": "V1–V28 özellikleri PCA ile anonimleştirilmiş banka verisidir. Threshold, F2-score (recall ağırlıklı) ile optimize edilmiştir.",
+    "high_risk": "Yüksek Risk",
+    "mid_risk": "Orta Risk",
+    "low_risk": "Düşük Risk",
+    "fraud_verdict": "Yüksek Fraud Riski",
+    "suspect_verdict": "Sınırda Risk",
+    "normal_verdict": "Düşük Risk",
+    "fraud_exp": "Bu işlem model tarafından yüksek olasılıkla dolandırıcılık olarak puanlandı.",
+    "suspect_exp": "Bu işlem sınırda risk profilindedir. Manuel inceleme önerilir.",
+    "normal_exp": "Bu işlem düşük risk profilindedir. Şüpheli bir sinyal tespit edilmedi.",
+    "error": "Hata",
 }
 
 
@@ -144,7 +119,7 @@ class Transaction(BaseModel):
 @api.post("/predict")
 def predict_api(transaction: Transaction):
     try:
-        features = np.array(transaction.features).reshape(1, -1)
+        features = _apply_scaler(np.array(transaction.features).reshape(1, -1))
         prob = float(model.predict_proba(features)[0][1])
         pred = int(prob >= threshold)
         logger.info(f"Tahmin: {'FRAUD' if pred else 'Normal'} | Olasılık: {prob:.4f}")
@@ -177,20 +152,21 @@ NORMAL_EXAMPLE = [
 ]
 
 BORDERLINE_EXAMPLE = [
-    48533.0, 1.2438, 0.5245, -0.5389, 1.2092, 0.4795, -0.1974, 0.0492,
-    0.0378, 0.1281, -0.5529, -0.6684, -0.8188, -0.8838, -0.9946, 1.5068,
-    0.6240, 0.7058, 0.5242, -0.7317, -0.1715, -0.0517, -0.0841, -0.1928,
-    -0.9174, 0.6820, -0.1944, 0.0459, 0.0401, 1.0
+    91502.0, 0.0074, 2.3652, -2.6003, 1.1116, 3.2764, -1.7761, 2.1145,
+    -0.8301, 0.9005, -3.3762, 2.0568, -3.9843, 1.022, -5.9679, -1.1516,
+    1.6797, 5.5861, 2.7891, -2.2411, -0.0064, -0.5639, -0.9021, -0.4044,
+    -0.0129, 0.5898, -0.7344, -0.4475, -0.3624, 1.0
 ]
 
 
 # ---------------------------------------------------------------------------
 # Tahmin fonksiyonu
 # ---------------------------------------------------------------------------
-def get_top_contributing_factors(features: list[float], top_k: int = 3):
+def get_top_contributing_factors(features_scaled: np.ndarray, top_k: int = 3):
+    """SHAP tree contributions — scaled features alır."""
     try:
         booster = model.get_booster()
-        dmatrix = xgb.DMatrix(np.array(features).reshape(1, -1), feature_names=FEATURE_NAMES)
+        dmatrix = xgb.DMatrix(features_scaled, feature_names=FEATURE_NAMES)
         contributions = booster.predict(dmatrix, pred_contribs=True)[0][:-1]
         top_idx = np.argsort(np.abs(contributions))[-top_k:][::-1]
         return [(FEATURE_NAMES[i], float(contributions[i])) for i in top_idx]
@@ -199,11 +175,16 @@ def get_top_contributing_factors(features: list[float], top_k: int = 3):
         return []
 
 
-def predict_gradio(*args):
-    t = TRANSLATIONS["tr"]
-    features = list(args)
+def _example_text(example: list) -> str:
+    return ", ".join(str(x) for x in example)
+
+
+def predict_gradio(text: str):
+    t = TRANSLATIONS
     try:
-        transaction = Transaction(features=features)
+        parts = [x.strip() for x in text.split(",") if x.strip()]
+        features_raw = [float(x) for x in parts]
+        transaction = Transaction(features=features_raw)
     except Exception as e:
         error_html = f"""
         <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:20px;text-align:center;">
@@ -216,7 +197,8 @@ def predict_gradio(*args):
     pred = result["prediction"]
     pct = prob * 100
 
-    amount = float(features[-1])
+    features_scaled = _apply_scaler(np.array(features_raw).reshape(1, -1))
+    amount = float(features_raw[-1])
     if prob >= 0.90:
         risk_label, risk_color, bg_color, border_color = t["high_risk"], "#dc2626", "#fee2e2", "#fca5a5"
         verdict, explanation = t["fraud_verdict"], t["fraud_exp"]
@@ -230,7 +212,7 @@ def predict_gradio(*args):
         verdict, explanation = t["normal_verdict"], t["normal_exp"]
         action_text = t["action_low"]
 
-    top_factors = get_top_contributing_factors(features, top_k=3)
+    top_factors = get_top_contributing_factors(features_scaled, top_k=3)
     top_factor_items = []
     for name, value in top_factors:
         direction = t["factor_up"] if value >= 0 else t["factor_down"]
@@ -290,21 +272,6 @@ def predict_gradio(*args):
     return result_html, detail_html
 
 
-def update_ui(lang):
-    t = TRANSLATIONS[lang]
-    return (
-        t["title"],
-        t["subtitle"],
-        t["quick_test"],
-        t["fraud_btn"],
-        t["normal_btn"],
-        t["analyze_btn"],
-        t["result_title"],
-        t["manual_input"],
-        t["footer"],
-    )
-
-
 # ---------------------------------------------------------------------------
 # Gradio UI
 # ---------------------------------------------------------------------------
@@ -319,29 +286,35 @@ APP_CSS = """
 }
 """
 
-with gr.Blocks(title="Credit Card Fraud Detection", css=APP_CSS) as demo:
+with gr.Blocks(title="Credit Card Fraud Detection") as demo:
 
     # Header
-    header_title = gr.Markdown("# Kredi Kartı Dolandırıcılık Tespiti")
-    header_sub = gr.Markdown("Kredi kartı işlemlerini gerçek zamanlı olarak analiz eden yapay zeka sistemi.\nAşağıdan bir örnek seçin veya kendi verilerinizi girin.")
+    gr.Markdown("# Kredi Kartı Dolandırıcılık Tespiti")
+    gr.Markdown(
+        "Kredi kartı işlemlerini gerçek zamanlı olarak analiz eden yapay zeka sistemi.  \n"
+        "Hazır örneklerden birini seçin veya kendi CSV satırınızı yapıştırın."
+    )
 
-    # Hızlı test
-    quick_test_md = gr.Markdown("### Hızlı Test")
+    # Hızlı test butonları
+    gr.Markdown("### Hızlı Test")
     with gr.Row():
-        btn_fraud = gr.Button("Yüksek Risk Örneği", variant="secondary")
-        btn_normal = gr.Button("Düşük Risk Örneği", variant="secondary")
+        btn_fraud      = gr.Button("Yüksek Risk Örneği",  variant="secondary")
+        btn_normal     = gr.Button("Düşük Risk Örneği",   variant="secondary")
         btn_borderline = gr.Button("Sınırda Risk Örneği", variant="secondary")
 
-    # Manuel giriş
-    with gr.Accordion("Manuel Veri Girişi (İleri Seviye)", open=False) as manual_accordion:
-        gr.Markdown("V1–V28, PCA dönüşümü uygulanmış anonim banka özellikleridir. Bu alanları doldurmak için orijinal veri setine ihtiyaç duyulur.")
-        inputs = [gr.Number(label=name, value=0.0) for name in FEATURE_NAMES]
+    # Tek Textbox girişi
+    txt_input = gr.Textbox(
+        label="İşlem Özellikleri (Time, V1–V28, Amount — virgülle ayrılmış 30 değer)",
+        placeholder="Örnek: 406.0, -2.3122, 1.9520, ..., 0.0",
+        lines=3,
+        info="Orijinal veri setinden bir satır kopyalayıp buraya yapıştırabilirsiniz. "
+             "V1–V28 sütunları PCA ile anonimleştirilmiş banka özelliklerini içerir.",
+    )
 
     # Analiz butonu
     btn_predict = gr.Button("Analiz Et", variant="primary", size="lg", elem_id="btn-predict")
 
     # Sonuç
-    result_title_md = gr.Markdown("### Sonuç")
     with gr.Row():
         with gr.Column(scale=3):
             out_result = gr.HTML()
@@ -349,22 +322,32 @@ with gr.Blocks(title="Credit Card Fraud Detection", css=APP_CSS) as demo:
             out_detail = gr.HTML()
 
     # Footer
-    footer_md = gr.Markdown("**Veri Seti:** [ULB Credit Card Fraud](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) — 284.807 işlem, %0.17 fraud\n**Model:** XGBoost | ROC-AUC: 0.975 | Threshold: F2-score ile optimize edildi")
-
-    # Tahmin
-    btn_predict.click(
-        fn=predict_gradio,
-        inputs=inputs,
-        outputs=[out_result, out_detail],
+    gr.Markdown(
+        "**Veri Seti:** [ULB Credit Card Fraud](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)"
+        " — 284.807 işlem, %0.17 fraud  \n"
+        "**Model:** XGBoost | ROC-AUC: 0.975 | Karar Eşiği: F2-score ile optimize edildi"
     )
-    btn_fraud.click(lambda: FRAUD_EXAMPLE, outputs=inputs)
-    btn_normal.click(lambda: NORMAL_EXAMPLE, outputs=inputs)
-    btn_borderline.click(lambda: BORDERLINE_EXAMPLE, outputs=inputs)
+
+    # Bağlantılar
+    btn_predict.click(fn=predict_gradio, inputs=[txt_input], outputs=[out_result, out_detail])
+
+    # Örnek butonlar: metni doldur → direkt analiz et
+    btn_fraud.click(
+        fn=lambda: _example_text(FRAUD_EXAMPLE), outputs=[txt_input]
+    ).then(fn=predict_gradio, inputs=[txt_input], outputs=[out_result, out_detail])
+
+    btn_normal.click(
+        fn=lambda: _example_text(NORMAL_EXAMPLE), outputs=[txt_input]
+    ).then(fn=predict_gradio, inputs=[txt_input], outputs=[out_result, out_detail])
+
+    btn_borderline.click(
+        fn=lambda: _example_text(BORDERLINE_EXAMPLE), outputs=[txt_input]
+    ).then(fn=predict_gradio, inputs=[txt_input], outputs=[out_result, out_detail])
 
 # ---------------------------------------------------------------------------
 # Mount & run
 # ---------------------------------------------------------------------------
-app = gr.mount_gradio_app(api, demo, path="/")
+app = gr.mount_gradio_app(api, demo, path="/", css=APP_CSS)
 
 if __name__ == "__main__":
     import uvicorn

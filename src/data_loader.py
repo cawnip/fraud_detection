@@ -12,15 +12,10 @@ def load_data(path: str = None) -> pd.DataFrame:
         raise FileNotFoundError(f"Dataset bulunamadı: {path}")
     df = pd.read_csv(path)
     logger.info(f"Veri yüklendi: {df.shape[0]} satır, {df.shape[1]} sütun")
-    print(f"Veri yüklendi: {df.shape[0]} satır, {df.shape[1]} sütun")
     return df
 
 
 def get_basic_info(df: pd.DataFrame) -> None:
     fraud_ratio = df['Class'].mean() * 100
-    logger.info(f"Fraud oranı: %{fraud_ratio:.4f}")
-    print("\n--- Temel Bilgiler ---")
-    print(f"Boyut: {df.shape}")
-    print(f"Eksik değer: {df.isnull().sum().sum()}")
-    print(f"\nClass dağılımı:\n{df['Class'].value_counts()}")
-    print(f"Fraud oranı: %{fraud_ratio:.4f}")
+    logger.info(f"Boyut: {df.shape} | Eksik: {df.isnull().sum().sum()} | Fraud: %{fraud_ratio:.4f}")
+    logger.info(f"Class dağılımı: {dict(df['Class'].value_counts())}")
