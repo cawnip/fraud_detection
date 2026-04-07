@@ -16,7 +16,7 @@ Kredi kartı işlemlerini gerçek zamanlı analiz eden, makine öğrenmesi taban
 
 284.807 işlem içeren gerçek banka verisinde **%0.17 fraud oranı** (ciddi class imbalance) ile çalışır. SMOTE, Optuna hyperparameter tuning, SHAP açıklanabilirlik ve F2-score threshold optimizasyonu içerir.
 
-**Demo:** *(HF Spaces deploy sonrası eklenecek)*
+**Demo:** [huggingface.co/spaces/cawnip/fraud-detection](https://huggingface.co/spaces/cawnip/fraud-detection)
 
 ---
 
