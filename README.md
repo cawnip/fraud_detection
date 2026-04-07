@@ -117,8 +117,8 @@ fraud-ai-system/
 ## Kurulum
 
 ```bash
-git clone <repo-url>
-cd fraud-ai-system
+git clone https://github.com/cawnip/fraud_detection.git
+cd fraud_detection
 
 # HF deploy / inference için
 pip install -r requirements.txt
