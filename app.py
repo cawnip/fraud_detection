@@ -286,7 +286,7 @@ APP_CSS = """
 }
 """
 
-with gr.Blocks(title="Credit Card Fraud Detection") as demo:
+with gr.Blocks(title="Credit Card Fraud Detection", css=APP_CSS) as demo:
 
     # Header
     gr.Markdown("# Kredi Kartı Dolandırıcılık Tespiti")
@@ -347,7 +347,7 @@ with gr.Blocks(title="Credit Card Fraud Detection") as demo:
 # ---------------------------------------------------------------------------
 # Mount & run
 # ---------------------------------------------------------------------------
-app = gr.mount_gradio_app(api, demo, path="/", css=APP_CSS)
+app = gr.mount_gradio_app(api, demo, path="/")
 
 if __name__ == "__main__":
     import uvicorn
