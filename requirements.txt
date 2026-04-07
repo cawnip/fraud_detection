@@ -3,7 +3,7 @@ huggingface_hub==0.23.5
 fastapi<0.115.0
 starlette<1.0.0
 numpy==2.2.4
-scikit-learn==1.8.0
+scikit-learn==1.7.2
 xgboost==3.2.0
 joblib==1.4.2
 audioop-lts; python_version>='3.13'
